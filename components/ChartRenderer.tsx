@@ -24,7 +24,7 @@ const ChartRenderer: React.FC<ChartRendererProps> = ({ config, data }) => {
     switch (config.type) {
       case 'stackedBar':
         return (
-          <BarChart data={data} margin={{ top: 40, right: 30, left: 20, bottom: 80 }}>
+          <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
             <XAxis 
               dataKey={config.xAxis} 
@@ -57,13 +57,13 @@ const ChartRenderer: React.FC<ChartRendererProps> = ({ config, data }) => {
       case 'bar':
         const isRelative = config.yAxis === 'relativeScore';
         return (
-          <BarChart data={data} margin={{ top: 50, right: 20, left: 10, bottom: 90 }}>
+          <BarChart data={data} margin={{ top: 30, bottom: 80 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
             <XAxis 
               dataKey={config.xAxis} 
               axisLine={false} 
               tickLine={false} 
-              tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 'bold'}} 
+              tick={{fill: '#94a3b8', fontSize: 10}} 
               angle={-45} 
               textAnchor="end"
               interval={0}
@@ -83,60 +83,47 @@ const ChartRenderer: React.FC<ChartRendererProps> = ({ config, data }) => {
               <LabelList 
                 dataKey={config.yAxis} 
                 position="top" 
-                fill={config.color || "#3b82f6"} 
+                fill="#3b82f6" 
                 fontSize={11} 
-                fontWeight="black" 
-                formatter={(val: number) => isRelative ? val.toFixed(1) : val} 
-                offset={10}
+                fontWeight="bold" 
+                formatter={(val: number) => isRelative ? val.toFixed(2) : val} 
               />
             </Bar>
           </BarChart>
         );
       case 'pie':
         return (
-          <PieChart margin={{ top: 60, right: 80, bottom: 60, left: 80 }}>
+          <PieChart margin={{ top: 40, right: 60, bottom: 40, left: 60 }}>
             <Pie
               data={data}
               cx="50%"
-              cy="40%"
-              innerRadius={50}
-              outerRadius={75} 
-              paddingAngle={6}
-              minAngle={25}
+              cy="45%"
+              innerRadius={55}
+              outerRadius={80} // Reduced radius to allow more room for labels
+              paddingAngle={5}
+              minAngle={20}
               dataKey={config.yAxis}
               nameKey={config.xAxis}
-              label={({name, percent, cx, x, y}) => {
-                if (percent < 0.04) return '';
-                const cleanName = name.length > 10 ? `${name.substring(0, 8)}..` : name;
-                const textAnchor = x > cx ? 'start' : 'end';
-                return (
-                  <text 
-                    x={x} 
-                    y={y} 
-                    fill="#94a3b8" 
-                    textAnchor={textAnchor} 
-                    dominantBaseline="central" 
-                    fontSize="10" 
-                    fontWeight="bold"
-                  >
-                    {`${cleanName} ${(percent * 100).toFixed(0)}%`}
-                  </text>
-                );
+              // Truncate name and check percent to avoid clutter
+              label={({name, percent}) => {
+                if (percent < 0.05) return '';
+                const cleanName = name.length > 12 ? `${name.substring(0, 10)}...` : name;
+                return `${cleanName} (${(percent * 100).toFixed(0)}%)`;
               }}
-              labelLine={{ stroke: '#334155', strokeWidth: 1.5 }}
+              labelLine={{ stroke: '#475569', strokeWidth: 1 }}
             >
               {data.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
                   fill={entry.part === 'Others' ? '#334155' : COLORS[index % COLORS.length]} 
-                  stroke="rgba(15, 23, 42, 0.8)" 
-                  strokeWidth={2}
+                  stroke="none" 
                 />
               ))}
             </Pie>
             <Tooltip 
               contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold' }} 
               itemStyle={{ color: '#fff' }}
+              formatter={(value, name) => [value, name]}
             />
             <Legend 
               verticalAlign="bottom" 
@@ -144,10 +131,11 @@ const ChartRenderer: React.FC<ChartRendererProps> = ({ config, data }) => {
               iconType="circle"
               layout="horizontal"
               wrapperStyle={{ 
-                paddingTop: '40px', 
+                paddingTop: '30px', 
                 fontSize: '9px', 
                 fontWeight: 'bold', 
-                textTransform: 'uppercase'
+                textTransform: 'uppercase',
+                maxWidth: '100%'
               }}
             />
           </PieChart>
