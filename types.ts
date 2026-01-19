@@ -9,20 +9,10 @@ export interface ChartConfig {
   dataKeys?: string[]; // Specifically for stacked charts
 }
 
-export interface SheetAnalysis {
-  summary: string;
-  insights: string[];
-  visualizations: ChartConfig[];
-}
+
 
 export interface DataRow {
   [key: string]: any;
 }
 
-export interface AppState {
-  data: DataRow[];
-  headers: string[];
-  analysis: SheetAnalysis | null;
-  loading: boolean;
-  error: string | null;
-}
+
