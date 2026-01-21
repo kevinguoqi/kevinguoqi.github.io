@@ -8,7 +8,7 @@ import PartImage from './components/PartImage';
 
 const BEYBLADE_X_SHEET_URL = "https://docs.google.com/spreadsheets/d/1kQS3IMBy3Aow_7NLPyneukB7973NusO6nHsFc3TtjKU/edit?gid=0#gid=0";
 
-type DashboardTab = 'Meta Environment' | 'Parts Usage Rate' | 'Raw Data';
+type DashboardTab = 'Meta Environment' | 'Usage View' | 'Raw Data';
 
 const App: React.FC = () => {
   const [rawData, setRawData] = useState<DataRow[]>([]);
@@ -16,7 +16,7 @@ const App: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<DashboardTab>('summary');
+  const [activeTab, setActiveTab] = useState<DashboardTab>('Meta Environment');
 
   // Filters
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
@@ -381,7 +381,7 @@ const App: React.FC = () => {
         </div>
 
         <div className="flex gap-2 p-1 bg-slate-950 border border-slate-800 rounded-2xl w-fit">
-          {(['summary', 'parts', 'data'] as DashboardTab[]).map(tab => (
+          {(['Meta Environment', 'Usage View', 'Raw Data'] as DashboardTab[]).map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} className={`px-10 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-900'}`}>{tab}</button>
           ))}
         </div>
@@ -395,7 +395,7 @@ const App: React.FC = () => {
           <div className="p-12 bg-red-900/10 border border-red-900/30 rounded-3xl text-center text-red-400 font-bold">{error}</div>
         ) : (
           <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {activeTab === 'summary' && (
+            {activeTab === 'Meta Environment' && (
               <div className="space-y-10">
                 <div className="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-10 shadow-2xl overflow-hidden relative">
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6 relative z-10">
@@ -478,7 +478,7 @@ const App: React.FC = () => {
               </div>
             )}
 
-            {activeTab === 'parts' && (
+            {activeTab === 'Usage View' && (
               <div className="space-y-20">
                 {categorizedUsage.map((category) => (
                   <div key={category.name} className="space-y-10 group">
@@ -524,7 +524,7 @@ const App: React.FC = () => {
               </div>
             )}
 
-            {activeTab === 'data' && (
+            {activeTab === 'Raw Data' && (
               <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
                 <div className="p-8 bg-slate-950/50 border-b border-slate-800 flex justify-between items-center">
                   <h3 className="font-black uppercase tracking-[0.3em] text-[10px] text-slate-500 italic">Historical Match History</h3>
@@ -557,9 +557,12 @@ const App: React.FC = () => {
       </main>
 
       <footer className="border-t border-slate-800 py-20 px-6 mt-20 text-center bg-slate-950 relative overflow-hidden">
-        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-500 mb-4 animate-pulse italic">System Overload // WBO Global Intel</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-500 mb-4 animate-pulse italic">© 2026 Beyblade X Data Hub by Kevin Guo</p>
         <p className="text-sm text-slate-600 font-medium leading-relaxed italic px-10 max-w-2xl mx-auto">
-          Market Share grouping implemented for clarity: slices &lt; 8% merged into "Others".
+          Market Usage grouping implemented for clarity: slices &lt; 8% merged into "Others".
+        </p>
+        <p className="text-sm text-slate-600 font-small leading-relaxed italic px-10 max-w-2xl mx-auto">
+          All rights belong to their owners.
         </p>
         <div className="mt-8 flex items-center justify-center gap-6 opacity-50 hover:opacity-100 transition-opacity">
           <span id="busuanzi_container_site_pv" className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
