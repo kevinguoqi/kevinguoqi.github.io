@@ -93,7 +93,7 @@ const ChartRenderer: React.FC<ChartRendererProps> = ({ config, data }) => {
         );
       case 'pie':
         return (
-          <PieChart margin={{ top: 40, right: 60, bottom: 40, left: 60 }}>
+          <PieChart margin={{ top: 20, right: 80, bottom: 20, left: 80 }}>
             <Pie
               data={data}
               cx="50%"
@@ -106,8 +106,8 @@ const ChartRenderer: React.FC<ChartRendererProps> = ({ config, data }) => {
               nameKey={config.xAxis}
               // Truncate name and check percent to avoid clutter
               label={({ name, percent }) => {
-                if (percent < 0.05) return '';
-                const cleanName = name.length > 12 ? `${name.substring(0, 10)}...` : name;
+                if (percent < 0.01) return '';
+                const cleanName = name.length > 15 ? `${name.substring(0, 12)}...` : name;
                 return `${cleanName} (${(percent * 100).toFixed(0)}%)`;
               }}
               labelLine={{ stroke: '#475569', strokeWidth: 1 }}

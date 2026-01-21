@@ -317,7 +317,7 @@ const App: React.FC = () => {
         {/* Multi-Row Filter Section */}
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-8">
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 flex items-center gap-2">
+            <h3 className="text-[16px] font-black uppercase tracking-[0.3em] text-blue-500 flex items-center gap-2">
               <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
               Meta Filter Grid
             </h3>
@@ -422,11 +422,23 @@ const App: React.FC = () => {
 
                 <div className="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden">
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6 relative z-10">
-                    <div>
-                      <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white">Weight Podium Score (Relative 0~100)</h2>
-                      <p className="text-xs text-slate-500 mt-2 uppercase tracking-[0.2em] font-bold">Relative Performance Coefficient (Normalized to Meta King)</p>
+                    <div className="flex flex-col gap-4">
+                      <div>
+                        <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white">Weight Podium Score (Relative 0~100)</h2>
+                        <p className="text-xs text-slate-500 mt-2 uppercase tracking-[0.2em] font-bold">Relative Performance Coefficient (Normalized to Meta King)</p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="px-2 py-1 bg-slate-800 text-slate-400 text-[9px] font-black uppercase tracking-widest rounded border border-slate-700">1st: 5 Pts</span>
+                        <span className="px-2 py-1 bg-slate-800 text-slate-400 text-[9px] font-black uppercase tracking-widest rounded border border-slate-700">2nd: 3 Pts</span>
+                        <span className="px-2 py-1 bg-slate-800 text-slate-400 text-[9px] font-black uppercase tracking-widest rounded border border-slate-700">3rd: 1 Pt</span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed max-w-xl">
+                        The blade with the highest WPS is the <span className="text-blue-400 font-bold">"King of the Meta"</span> (100). All others are scored as a percentage of the leader to show relative effectiveness.
+                        <br />
+                        <span className="font-mono text-slate-500 mt-1 block text-[9px]">Formula: (Blade's WPS / Highest WPS) × 100</span>
+                      </p>
                     </div>
-                    <div className="bg-blue-600/10 border border-blue-500/20 px-4 py-2 rounded-xl">
+                    <div className="bg-blue-600/10 border border-blue-500/20 px-4 py-2 rounded-xl h-fit">
                       <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest italic">Normalized Ranking</span>
                     </div>
                   </div>
@@ -558,9 +570,6 @@ const App: React.FC = () => {
 
       <footer className="border-t border-slate-800 py-20 px-6 mt-20 text-center bg-slate-950 relative overflow-hidden">
         <p className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-500 mb-4 animate-pulse italic">© 2026 Beyblade X Data Hub by Kevin Guo</p>
-        <p className="text-sm text-slate-600 font-medium leading-relaxed italic px-10 max-w-2xl mx-auto">
-          Market Usage grouping implemented for clarity: slices &lt; 8% merged into "Others".
-        </p>
         <p className="text-sm text-slate-600 font-small leading-relaxed italic px-10 max-w-2xl mx-auto">
           All rights belong to their owners.
         </p>
