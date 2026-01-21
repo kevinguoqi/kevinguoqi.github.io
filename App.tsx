@@ -8,7 +8,7 @@ import PartImage from './components/PartImage';
 
 const BEYBLADE_X_SHEET_URL = "https://docs.google.com/spreadsheets/d/1kQS3IMBy3Aow_7NLPyneukB7973NusO6nHsFc3TtjKU/edit?gid=0#gid=0";
 
-type DashboardTab = 'summary' | 'parts' | 'data';
+type DashboardTab = 'Meta Environment' | 'Parts Usage Rate' | 'Raw Data';
 
 const App: React.FC = () => {
   const [rawData, setRawData] = useState<DataRow[]>([]);
@@ -23,7 +23,8 @@ const App: React.FC = () => {
   const [selectedBlade, setSelectedBlade] = useState('All');
   const [selectedRatchet, setSelectedRatchet] = useState('All');
   const [selectedBit, setSelectedBit] = useState('All');
-  const [selectedType, setSelectedType] = useState('All');
+  const [selectedAssistBlade, setSelectedAssistBlade] = useState('All');
+  const [selectedLockChip, setSelectedLockChip] = useState('All');
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -86,7 +87,8 @@ const App: React.FC = () => {
     const blades = new Set<string>();
     const ratchets = new Set<string>();
     const bits = new Set<string>();
-    const types = new Set<string>();
+    const assistBlades = new Set<string>();
+    const lockChips = new Set<string>();
 
     rawData.forEach(row => {
       const dateVal = getFuzzyValue(row, KEY_PATTERNS.date);
@@ -100,12 +102,14 @@ const App: React.FC = () => {
       const b = getFuzzyValue(row, /^blade$/i) || getFuzzyValue(row, /^main\s*blade$/i);
       const r = getFuzzyValue(row, /^ratchet$/i);
       const bt = getFuzzyValue(row, /^bit$/i);
-      const t = getFuzzyValue(row, KEY_PATTERNS.type);
+      const ab = getFuzzyValue(row, /^assist\s*blade$/i);
+      const lc = getFuzzyValue(row, /^lock\s*chip$/i);
 
       if (b) blades.add(String(b).trim());
       if (r) ratchets.add(String(r).trim());
       if (bt) bits.add(String(bt).trim());
-      if (t) types.add(String(t).trim());
+      if (ab) assistBlades.add(String(ab).trim());
+      if (lc) lockChips.add(String(lc).trim());
     });
 
     return {
@@ -113,7 +117,8 @@ const App: React.FC = () => {
       blades: Array.from(blades).sort(),
       ratchets: Array.from(ratchets).sort(),
       bits: Array.from(bits).sort(),
-      types: Array.from(types).sort()
+      assistBlades: Array.from(assistBlades).sort(),
+      lockChips: Array.from(lockChips).sort()
     };
   }, [rawData]);
 
@@ -129,19 +134,22 @@ const App: React.FC = () => {
       const b = getFuzzyValue(row, /^blade$/i) || getFuzzyValue(row, /^main\s*blade$/i);
       const r = getFuzzyValue(row, /^ratchet$/i);
       const bt = getFuzzyValue(row, /^bit$/i);
-      const t = getFuzzyValue(row, KEY_PATTERNS.type);
+      const ab = getFuzzyValue(row, /^assist\s*blade$/i);
+      const lc = getFuzzyValue(row, /^lock\s*chip$/i);
+
 
       if (selectedBlade !== 'All' && String(b || '').trim() !== selectedBlade) return false;
       if (selectedRatchet !== 'All' && String(r || '').trim() !== selectedRatchet) return false;
       if (selectedBit !== 'All' && String(bt || '').trim() !== selectedBit) return false;
-      if (selectedType !== 'All' && String(t || '').trim() !== selectedType) return false;
+      if (selectedAssistBlade !== 'All' && String(ab || '').trim() !== selectedAssistBlade) return false;
+      if (selectedLockChip !== 'All' && String(lc || '').trim() !== selectedLockChip) return false;
 
       return true;
     });
-  }, [rawData, dateRange, selectedBlade, selectedRatchet, selectedBit, selectedType]);
+  }, [rawData, dateRange, selectedBlade, selectedRatchet, selectedBit, selectedAssistBlade, selectedLockChip]);
 
   const comboPoints = useMemo(() => {
-    const scores: Record<string, { points: number, parts: { name: string, url: string, type: 'blade' | 'ratchet' | 'bit' }[] }> = {};
+    const scores: Record<string, { points: number, parts: { name: string, url: string, type: 'blade' | 'ratchet' | 'bit' | 'lock_chip' | 'assist_blade' }[] }> = {};
     filteredData.forEach(row => {
       const lock = String(getFuzzyValue(row, /^lock\s*chip$/i) || '').trim();
       const main = String(getFuzzyValue(row, /^main\s*blade$/i) || '').trim();
@@ -313,7 +321,7 @@ const App: React.FC = () => {
               <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
               Meta Filter Grid
             </h3>
-            <button onClick={() => { setDateRange({ start: '', end: '' }); setSelectedBlade('All'); setSelectedRatchet('All'); setSelectedBit('All'); setSelectedType('All'); }} className="text-[10px] font-bold text-slate-500 uppercase hover:text-white transition-colors underline decoration-slate-800 underline-offset-4">Reset Grid</button>
+            <button onClick={() => { setDateRange({ start: '', end: '' }); setSelectedBlade('All'); setSelectedRatchet('All'); setSelectedBit('All'); setSelectedAssistBlade('All'); setSelectedLockChip('All'); }} className="text-[10px] font-bold text-slate-500 uppercase hover:text-white transition-colors underline decoration-slate-800 underline-offset-4">Reset Grid</button>
           </div>
 
           <div className="space-y-6">
@@ -347,12 +355,13 @@ const App: React.FC = () => {
 
             <div className="space-y-4">
               <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest border-l-2 border-cyan-500 pl-3">Component Tuning</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 {[
+                  { label: 'Lock Chip', value: selectedLockChip, setter: setSelectedLockChip, options: filterOptions.lockChips },
                   { label: 'Blade', value: selectedBlade, setter: setSelectedBlade, options: filterOptions.blades },
+                  { label: 'Assist', value: selectedAssistBlade, setter: setSelectedAssistBlade, options: filterOptions.assistBlades },
                   { label: 'Ratchet', value: selectedRatchet, setter: setSelectedRatchet, options: filterOptions.ratchets },
-                  { label: 'Bit', value: selectedBit, setter: setSelectedBit, options: filterOptions.bits },
-                  { label: 'Combo Type', value: selectedType, setter: setSelectedType, options: filterOptions.types }
+                  { label: 'Bit', value: selectedBit, setter: setSelectedBit, options: filterOptions.bits }
                 ].map((item) => (
                   <div key={item.label} className="space-y-2">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em]">{item.label}</label>
@@ -400,12 +409,14 @@ const App: React.FC = () => {
                       <div className="flex items-center gap-2"><div className="w-3 h-3 bg-[#f59e0b] rounded-sm"></div><span className="text-[9px] font-black text-slate-400 uppercase">3rd Place</span></div>
                     </div>
                   </div>
-                  <div className="h-[500px]">
-                    {bladePodiumFrequency.length > 0 ? (
-                      <ChartRenderer config={{ type: 'stackedBar', title: '', xAxis: 'name', yAxis: 'total', description: '' }} data={bladePodiumFrequency} />
-                    ) : (
-                      <div className="h-full flex items-center justify-center border border-dashed border-slate-800 rounded-2xl bg-slate-950/30 text-slate-600 font-black uppercase text-xs tracking-widest">No Podium Results Detected</div>
-                    )}
+                  <div className="overflow-x-auto pb-4">
+                    <div className="h-[500px] min-w-[800px]">
+                      {bladePodiumFrequency.length > 0 ? (
+                        <ChartRenderer config={{ type: 'stackedBar', title: '', xAxis: 'name', yAxis: 'total', description: '' }} data={bladePodiumFrequency} />
+                      ) : (
+                        <div className="h-full flex items-center justify-center border border-dashed border-slate-800 rounded-2xl bg-slate-950/30 text-slate-600 font-black uppercase text-xs tracking-widest">No Podium Results Detected</div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -419,12 +430,14 @@ const App: React.FC = () => {
                       <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest italic">Normalized Ranking</span>
                     </div>
                   </div>
-                  <div className="h-[500px]">
-                    {bladeNormalizedScores.length > 0 ? (
-                      <ChartRenderer config={{ type: 'bar', title: '', xAxis: 'name', yAxis: 'relativeScore', description: '', color: '#3b82f6' }} data={bladeNormalizedScores} />
-                    ) : (
-                      <div className="h-full flex items-center justify-center text-slate-600 font-black uppercase text-xs tracking-widest">Insufficient Data for Weighting</div>
-                    )}
+                  <div className="overflow-x-auto pb-4">
+                    <div className="h-[500px] min-w-[800px]">
+                      {bladeNormalizedScores.length > 0 ? (
+                        <ChartRenderer config={{ type: 'bar', title: '', xAxis: 'name', yAxis: 'relativeScore', description: '', color: '#3b82f6' }} data={bladeNormalizedScores} />
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-slate-600 font-black uppercase text-xs tracking-widest">Insufficient Data for Weighting</div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -482,8 +495,10 @@ const App: React.FC = () => {
                       {/* Donut Chart with grouping */}
                       <div className="lg:col-span-2 bg-slate-900/50 backdrop-blur border border-slate-800 rounded-[2.5rem] p-10 shadow-2xl relative">
                         <h3 className="text-xs font-black uppercase text-slate-500 mb-8 tracking-[0.2em]">{category.name} Market Distribution</h3>
-                        <div className="h-[350px]">
-                          <ChartRenderer config={{ type: 'pie', title: '', xAxis: 'part', yAxis: 'count', description: '' }} data={category.pieData} />
+                        <div className="overflow-x-auto pb-4">
+                          <div className="h-[350px] min-w-[500px]">
+                            <ChartRenderer config={{ type: 'pie', title: '', xAxis: 'part', yAxis: 'count', description: '' }} data={category.pieData} />
+                          </div>
                         </div>
                       </div>
 
@@ -546,6 +561,16 @@ const App: React.FC = () => {
         <p className="text-sm text-slate-600 font-medium leading-relaxed italic px-10 max-w-2xl mx-auto">
           Market Share grouping implemented for clarity: slices &lt; 8% merged into "Others".
         </p>
+        <div className="mt-8 flex items-center justify-center gap-6 opacity-50 hover:opacity-100 transition-opacity">
+          <span id="busuanzi_container_site_pv" className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+            Total Views: <span id="busuanzi_value_site_pv" className="text-white"></span>
+          </span>
+          <span id="busuanzi_container_site_uv" className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full"></span>
+            Visitors: <span id="busuanzi_value_site_uv" className="text-white"></span>
+          </span>
+        </div>
       </footer>
     </div>
   );
